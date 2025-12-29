@@ -1,0 +1,536 @@
+import React, { useState, useEffect } from 'react';
+import { MapPin, Clock, X, Check, AlertCircle, ArrowRight, History, MoreHorizontal, Eye, Camera, Star, ChevronUp, Share } from 'lucide-react';
+
+// 詳細數據源 (內容已擴充)
+const scheduleData = [
+  {
+    date: "12/29",
+    day: "第一天",
+    theme: "金陵帝王氣",
+    sections: [
+      {
+        period: "早上",
+        spots: [
+          {
+            name: "玄武湖",
+            timeDisplay: "全天開放",
+            bookingStatus: null,
+            shortDesc: "金陵明珠，皇家園林",
+            mustVisit: ["環洲煙柳", "櫻洲花海", "菱洲", "從湖面看城牆"],
+            detail: {
+              year: "始於秦漢 (前200年左右)",
+              title: "中國僅存的江南皇家園林",
+              history: "玄武湖古名桑泊，距今已有兩千三百年歷史。六朝時期為皇家園林，操練水軍之所。明朝朱元璋定都南京後，將其闢為國家級檔案館（黃冊庫），嚴禁百姓入內，成為禁地長達260餘年。",
+              features: "湖岸呈菱形，周長約10公里，五洲（環洲、櫻洲、菱洲、梁洲、翠洲）分佈其中，洲洲堤橋相通，渾然一體。",
+              highlight: "這裡是中國歷代皇室保留最完整的城市湖泊公園，也是欣賞南京明城牆最美的角度之一。"
+            }
+          },
+          {
+            name: "雞鳴寺",
+            timeDisplay: "17:00 閉園",
+            bookingStatus: null,
+            shortDesc: "南朝四百八十寺之首",
+            mustVisit: ["藥師佛塔", "古胭脂井", "素齋麵館", "櫻花大道(季節性)"],
+            detail: {
+              year: "始建於西晉永康元年 (300年)",
+              title: "南朝第一寺，皇室佛緣",
+              history: "前身是三國東吳的棲玄寺。南朝梁武帝蕭衍在此興建同泰寺，曾四次捨身出家，不僅是佛教中心，更是南朝政治文化的焦點。歷經戰火毀損，現存建築多為明清及近代重建。",
+              features: "寺廟依山而建，層次分明。黃牆黑瓦的建築風格在南京眾多寺廟中獨樹一幟。藥師佛塔七層八面，是南京的地標之一。",
+              highlight: "「南朝四百八十寺，多少樓台煙雨中」這句詩最能代表這裡的意境。"
+            }
+          }
+        ]
+      },
+      {
+        period: "下午/傍晚",
+        spots: [
+          {
+            name: "明故宮遺址公園",
+            timeDisplay: "18:30 閉園",
+            bookingStatus: null,
+            shortDesc: "北京故宮的藍本",
+            mustVisit: ["午門五鳳樓", "奉天殿石基", "內五龍橋", "石柱礎"],
+            detail: {
+              year: "始建於明洪武年間 (1366年)",
+              title: "中世紀世界最大的宮殿建築群",
+              history: "明故宮（南京紫禁城）是北京故宮的藍本，開創了明清兩代宮殿建築的規制。朱元璋在此登基，但在明成祖遷都北京後逐漸衰落，後經清軍入關及太平天國戰火，地面宏偉建築幾近全毀。",
+              features: "雖然僅存遺址，但從巨大的石柱礎和保留完整的午門，仍可想像當年的恢弘氣勢。整體佈局嚴謹，講究中軸對稱。",
+              highlight: "這裡是中國古代都城宮殿建築的集大成者，也是了解明初歷史的最佳實物檔案。"
+            }
+          },
+          {
+            name: "南京城牆",
+            timeDisplay: "21:00 閉園",
+            bookingStatus: null,
+            shortDesc: "世界第一大城垣",
+            mustVisit: ["中華門甕城", "城磚銘文", "藏兵洞", "馬道"],
+            detail: {
+              year: "始建於1366年，歷時28年建成",
+              title: "世界最長、規模最大、保存最原真性的古代城垣",
+              history: "朱元璋採納朱升「高築牆」的建議興建。動用了全國5部162個縣的百姓，耗費城磚3.5億塊。它不僅是防禦工事，更是皇權的象徵。",
+              features: "中華門是中國現存最大的城堡式甕城，設計精巧，設有三道甕城和四道拱門，更有藏兵洞可容納三千甲士，展現了極高的軍事智慧。",
+              highlight: "每一塊城磚上都刻有監造官員和工匠的名字，建立了最早的「質量責任追究制」，是研究明代戶籍與文字的寶庫。"
+            }
+          }
+        ]
+      },
+      {
+        period: "晚上",
+        spots: [
+          {
+            name: "老門東",
+            timeDisplay: "全天開放",
+            bookingStatus: "推薦",
+            shortDesc: "最南京的市井煙火",
+            mustVisit: ["駿惠書屋", "金陵刻經處", "小吃街", "芥子園"],
+            detail: {
+              year: "歷史可追溯至三國時期",
+              title: "南京傳統民居聚集地",
+              history: "老門東位於南京城南中華門以東，自古就是江南商賈雲集、人文薈萃之地。這裡是南京傳統生活面貌保存最完整的地方，見證了南京老城南的興衰。",
+              features: "保留了大量明清風格的民居與街巷，馬頭牆、花格窗隨處可見。巷陌縱橫，充滿了濃厚的市井氣息。",
+              highlight: "除了建築，這裡匯集了幾乎所有南京地道小吃：梅花糕、雞汁湯包、鴨血粉絲湯，是味蕾的盛宴。"
+            }
+          },
+          {
+            name: "夫子廟",
+            timeDisplay: "全天開放",
+            bookingStatus: "推薦",
+            shortDesc: "中國四大文廟之一",
+            mustVisit: ["大成殿", "江南貢院", "烏衣巷", "王導謝安紀念館"],
+            detail: {
+              year: "始建於東晉咸康三年 (337年)",
+              title: "中國第一所國家最高學府",
+              history: "夫子廟是一組規模宏大的古建築群，由孔廟、學宮、貢院三大建築群組成。歷經多次毀建，現存建築多為清代晚期風格。",
+              features: "江南貢院曾是中國古代最大的科舉考場，明清時期半數以上的官員出自於此。大成殿內懸掛的「萬世師表」匾額極具歷史價值。",
+              highlight: "這裡不僅是儒家文化的中心，秦淮河畔的燈會更被譽為「秦淮燈彩甲天下」。"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    date: "12/30",
+    day: "第二天",
+    theme: "民國與史詩",
+    sections: [
+      {
+        period: "早上",
+        spots: [
+          {
+            name: "南京博物院",
+            timeDisplay: "17:00 閉館",
+            bookingStatus: "已預約",
+            shortDesc: "中國三大博物館之一",
+            mustVisit: ["民國館 (地下)", "鎮館之寶：金獸", "金縷玉衣", "大報恩寺琉璃拱門"],
+            detail: {
+              year: "創建於1933年",
+              title: "中國第一座由國家投資興建的大型綜合博物館",
+              history: "前身是蔡元培倡議建立的國立中央博物院籌備處。它是中國最早創建的博物館之一，與北京故宮、台北故宮並稱為「中國三大博物館」。",
+              features: "主殿仿遼代宮殿式建築，氣勢恢宏。最特別的是地下的「民國館」，真實還原了20世紀30年代南京的街道、火車站與店舖，彷彿穿越時空。",
+              highlight: "館藏文物43萬餘件，其中江蘇地區出土的考古文物是其強項。"
+            }
+          }
+        ]
+      },
+      {
+        period: "下午",
+        spots: [
+          {
+            name: "總統府",
+            timeDisplay: "17:00 閉園",
+            bookingStatus: "已預約",
+            note: "黃炘苡手機",
+            shortDesc: "半部近代史",
+            mustVisit: ["子超樓", "煦園 (西花園)", "孫中山起居室", "行政院大樓"],
+            detail: {
+              year: "明朝漢王府 -> 清朝兩江總督署 -> 民國總統府",
+              title: "中國近代史遺存博物館",
+              history: "這塊地承載了太多的歷史：明朝是漢王府，清朝是康熙乾隆下江南的行宮及兩江總督署，太平天國時期是洪秀全的天王府，民國時期則是國民政府總統府。",
+              features: "建築風格中西合璧，既有江南園林的精緻（煦園），又有民國官署的莊嚴（子超樓）。",
+              highlight: "在「子超樓」可以看到當年蔣介石、李宗仁的辦公室原貌，以及孫中山先生手書的「天下為公」。"
+            }
+          },
+          {
+            name: "南京大屠殺紀念館",
+            timeDisplay: "17:00 閉館",
+            bookingStatus: "待預約",
+            shortDesc: "勿忘國恥，和平之聲",
+            mustVisit: ["萬人坑遺址", "12秒水滴裝置", "和平女神像", "史料陳列廳"],
+            detail: {
+              year: "建成於1985年",
+              title: "中國首批國家一級博物館",
+              history: "全名為侵華日軍南京大屠殺遇難同胞紀念館，選址於當年日軍大屠殺的遺址之一「江東門萬人坑」之上。",
+              features: "建築採用灰白色調，外形如同這片土地上的一塊斷裂的刀，營造出莊嚴肅穆、壓抑但又充滿力量的氛圍。",
+              highlight: "著名的「12秒」水滴聲裝置，象徵每12秒就有一個生命在戰爭中消逝，極具震撼力。"
+            }
+          }
+        ]
+      },
+      {
+        period: "晚上",
+        spots: [
+          {
+            name: "秦淮河",
+            timeDisplay: "全天開放",
+            bookingStatus: "推薦",
+            shortDesc: "南京的母親河",
+            mustVisit: ["畫舫夜遊", "桃葉渡", "白鷺洲公園", "東水關"],
+            detail: {
+              year: "千古傳唱",
+              title: "中國第一歷史文化名河",
+              history: "「煙籠寒水月籠沙，夜泊秦淮近酒家」。秦淮河孕育了南京的古老文化，六朝金粉之地，明清時期更是江南科舉與商業中心。",
+              features: "夜間的秦淮河是南京最美的一面，兩岸的馬頭牆在燈光映襯下倒映水中，畫舫穿梭其間。",
+              highlight: "建議乘坐畫舫遊覽，從水路視角體驗「槳聲燈影裡的秦淮河」，感受古人的風雅。"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    date: "12/31",
+    day: "第三天",
+    theme: "鍾山風雨",
+    sections: [
+      {
+        period: "白天",
+        spots: [
+          {
+            name: "中山陵",
+            timeDisplay: "17:00 閉園",
+            bookingStatus: "待預約",
+            shortDesc: "中國近代建築史上的第一陵",
+            mustVisit: ["博愛坊", "392級台階", "祭堂", "天下為公匾額"],
+            detail: {
+              year: "建成於1929年",
+              title: "中國近代民主革命先行者孫中山的陵墓",
+              history: "孫中山先生逝世後，遵照其遺願葬於南京紫金山。陵墓設計通過國際競賽，由建築師呂彥直設計，融合了中西建築精華。",
+              features: "整個建築群依山而建，中軸對稱。從空中俯瞰，整個陵墓像一座平臥在綠絨毯上的「自由鐘」。392級台階象徵著當時中國3億9千2百萬同胞。",
+              highlight: "祭堂內的孫中山大理石坐像是波蘭雕刻家保羅·蘭多斯基的作品。雖然墓室現已不開放，但祭堂的莊嚴氛圍仍令人肅然起敬。"
+            }
+          },
+          {
+            name: "明孝陵",
+            timeDisplay: "18:00 閉園",
+            bookingStatus: null,
+            shortDesc: "明清皇家陵寢之首",
+            mustVisit: ["石象路 (最美600米)", "文武方門", "方城明樓", "寶頂"],
+            detail: {
+              year: "始建於1381年",
+              title: "中國古代最大的帝王陵寢之一",
+              history: "明太祖朱元璋與馬皇后的合葬陵墓。耗費巨資與人力，歷時30餘年建成。清代康熙、乾隆下江南時均親往祭掃，以示統治的正統性。",
+              features: "神道石刻保存完好，尤其是石象路，兩旁的石獸威嚴聳立，配上秋季的梧桐與銀杏，被譽為「南京最美600米」。",
+              highlight: "開創了明清皇陵「前方後圓」的陵寢規制，對後世五百年的帝陵形制產生了深遠影響。"
+            }
+          },
+          {
+            name: "蔣陵 (孫權墓)",
+            timeDisplay: "全天開放",
+            bookingStatus: null,
+            shortDesc: "三國大帝孫權之墓",
+            mustVisit: ["梅花山", "孫權石像", "梅花妝韻"],
+            detail: {
+              year: "三國時期",
+              title: "南京地區最早的帝王陵墓",
+              history: "位於梅花山，據傳朱元璋建明孝陵時，為了神道的走向，特意保留了孫權墓，霸氣地說：「孫權也是一條好漢，留著給我看門吧」。",
+              features: "雖然地表建築已無存，但梅花山作為南京賞梅勝地，其地下長眠著這位東吳大帝，增添了歷史的厚重感。",
+              highlight: "春天時萬株梅花盛開，與歷史遺跡交相輝映。"
+            }
+          },
+          {
+            name: "國民政府主席官邸",
+            timeDisplay: "18:00 閉館",
+            bookingStatus: "已預約",
+            shortDesc: "美齡宮，遠東第一別墅",
+            mustVisit: ["空中項鍊視角", "凱迪拉克停放處", "蔣宋臥室", "地下廚房"],
+            detail: {
+              year: "建成於1934年",
+              title: "遠東第一別墅",
+              history: "正式名稱為「國民政府主席官邸」，因蔣介石與宋美齡常居於此，俗稱「美齡宮」。曾作為國民政府官員拜謁中山陵的休息處。",
+              features: "建築風格中西合璧，外觀是傳統宮殿式大屋頂，內部則是西式別墅裝潢。最為人稱道的是，從高空俯瞰，陵園路兩旁的梧桐樹如同一條項鍊，而美齡宮正是項鍊上的那顆綠寶石。",
+              highlight: "內部的裝飾極盡考究，展現了民國時期的頂級審美與生活方式。"
+            }
+          }
+        ]
+      }
+    ]
+  }
+];
+
+// 組件：時間狀態徽章 (Orange Logic Here)
+const TimeStatusBadge = ({ time }) => {
+  const isAlwaysOpen = time.includes("全天");
+  const baseClasses = "inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wide shadow-sm";
+  
+  if (isAlwaysOpen) {
+    return (
+      <span className={`${baseClasses} bg-[#f0f1f3] text-[#444746]`}>
+        <Clock size={11} className="mr-1" />
+        {time}
+      </span>
+    );
+  }
+  // 按照要求，閉園時間使用橘色
+  return (
+    <span className={`${baseClasses} bg-[#fff0e0] text-[#e65100]`}>
+      <Clock size={11} className="mr-1" />
+      {time}
+    </span>
+  );
+};
+
+// 組件：預約狀態徽章
+const BookingBadge = ({ status, note }) => {
+  if (!status && !note) return null;
+  
+  let bgClass = "";
+  let textClass = "";
+  let icon = null;
+
+  if (status === "已預約") {
+    bgClass = "bg-[#d1e7dd] text-[#0f5132]";
+    icon = <Check size={11} className="mr-1" />;
+  } else if (status === "待預約") {
+    bgClass = "bg-[#f8d7da] text-[#842029]";
+    icon = <AlertCircle size={11} className="mr-1" />;
+  } else { // 推薦
+    bgClass = "bg-[#fff3cd] text-[#664d03]";
+    icon = <Star size={11} className="mr-1" />;
+  }
+
+  return (
+    <div className="flex flex-col items-end gap-1.5 mb-2">
+      <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold shadow-sm ${bgClass} ${textClass}`}>
+        {icon}
+        {status}
+      </span>
+      {note && (
+        <span className="text-[10px] text-[#854d0e] bg-[#fef3c7] px-2 py-0.5 rounded-md font-medium border border-[#fde68a]">
+          {note}
+        </span>
+      )}
+    </div>
+  );
+};
+
+export default function NanjingItineraryMobile() {
+  const [selectedSpot, setSelectedSpot] = useState(null);
+  const [isClosing, setIsClosing] = useState(false);
+
+  // 處理關閉動畫
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setSelectedSpot(null);
+      setIsClosing(false);
+    }, 300); // 配合 CSS transition
+  };
+
+  // 防止背景滾動
+  useEffect(() => {
+    if (selectedSpot) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [selectedSpot]);
+
+  return (
+    <div className="min-h-screen bg-[#f8f9fa] font-sans pb-24 selection:bg-[#ffecb3] selection:text-[#5d4037] touch-manipulation">
+      
+      {/* Mobile Header */}
+      <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-slate-100 safe-area-top">
+        <div className="px-5 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-[#1a237e] text-white flex items-center justify-center font-bold text-lg shadow-sm">
+              京
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-[#1c1b1f] leading-none">南京三日</h1>
+              <p className="text-[10px] text-[#49454f] mt-0.5 font-medium uppercase tracking-wide">Dec 29 - 31</p>
+            </div>
+          </div>
+          <button className="w-9 h-9 rounded-full bg-slate-50 text-slate-600 flex items-center justify-center active:bg-slate-200 transition-colors">
+            <Share size={18} />
+          </button>
+        </div>
+      </div>
+
+      <div className="px-4 pt-6 space-y-8 max-w-md mx-auto">
+        {scheduleData.map((day, index) => (
+          <div key={index} className="animate-in fade-in slide-in-from-bottom-6 duration-700" style={{ animationDelay: `${index * 100}ms` }}>
+            
+            {/* Date Header */}
+            <div className="mb-4 px-1 flex items-baseline justify-between">
+              <div className="flex items-baseline gap-2">
+                <h2 className="text-2xl font-bold text-[#1c1b1f] tracking-tight">{day.date}</h2>
+                <span className="text-xs font-bold text-[#1a237e] bg-[#e8eaf6] px-2 py-0.5 rounded-full">{day.day}</span>
+              </div>
+              <p className="text-[#5f6368] text-xs font-medium italic">{day.theme}</p>
+            </div>
+
+            {/* Timeline content */}
+            <div className="space-y-4">
+              {day.sections.map((section, sIndex) => (
+                <div key={sIndex} className="relative">
+                  
+                  {/* Period Label - Styled like a section divider */}
+                  <div className="flex items-center mb-3">
+                    <div className="w-1 h-3 bg-[#1a237e] rounded-full mr-2"></div>
+                    <h3 className="text-xs font-bold text-[#5f6368] uppercase tracking-wider">
+                      {section.period}
+                    </h3>
+                  </div>
+
+                  <div className="space-y-3 pl-3 border-l border-slate-200 ml-1.5 pb-2">
+                    {section.spots.map((spot, spotIndex) => (
+                      <div 
+                        key={spotIndex}
+                        onClick={() => setSelectedSpot(spot)}
+                        className="group bg-white active:bg-slate-50 active:scale-[0.98] transition-all duration-200 rounded-2xl p-4 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] border border-slate-100 cursor-pointer relative overflow-hidden ml-2"
+                      >
+                        <div className="flex justify-between items-start relative z-10">
+                          {/* Left: Content */}
+                          <div className="flex-1 mr-2">
+                            <h4 className="text-[17px] font-bold text-[#1c1b1f] mb-1 leading-tight flex items-center">
+                              {spot.name}
+                              <ChevronUp size={16} className="text-slate-300 ml-1 rotate-90" />
+                            </h4>
+                            <p className="text-[13px] text-[#5f6368] leading-snug mb-2 line-clamp-1">
+                              {spot.shortDesc}
+                            </p>
+                            
+                            {/* Closing Time Badge (Orange as requested) */}
+                            <TimeStatusBadge time={spot.timeDisplay} />
+                          </div>
+                          
+                          {/* Right: Booking Status */}
+                          <div className="flex flex-col items-end shrink-0">
+                            <BookingBadge status={spot.bookingStatus} note={spot.note} />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Mobile Bottom Sheet Modal */}
+      {selectedSpot && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
+          {/* Backdrop */}
+          <div 
+            className={`absolute inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
+            onClick={handleClose}
+          ></div>
+          
+          {/* Sheet Content */}
+          <div 
+            className={`bg-white w-full max-w-md sm:rounded-[28px] rounded-t-[28px] shadow-2xl overflow-hidden relative flex flex-col max-h-[90vh] transition-transform duration-300 transform ${isClosing ? 'translate-y-full' : 'translate-y-0'} animate-in slide-in-from-bottom`}
+          >
+            
+            {/* Sheet Handle (Mobile visual cue) */}
+            <div className="w-full flex justify-center pt-3 pb-1 bg-[#f0f4f8] sm:hidden" onClick={handleClose}>
+              <div className="w-12 h-1.5 bg-slate-300 rounded-full"></div>
+            </div>
+
+            {/* Header Area */}
+            <div className="bg-[#f0f4f8] px-6 pb-6 pt-2 relative shrink-0">
+              <button 
+                onClick={handleClose}
+                className="absolute top-4 right-4 p-2 bg-white/60 rounded-full text-slate-700 active:bg-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="flex items-center text-[#1a237e] text-xs font-bold mb-2">
+                <MapPin size={12} className="mr-1" />
+                南京
+              </div>
+              <h2 className="text-2xl font-bold text-[#1c1b1f] leading-tight mb-1">{selectedSpot.name}</h2>
+              <div className="inline-flex items-center bg-[#1a237e] text-white px-2 py-0.5 rounded text-[10px] font-bold tracking-wide">
+                <History size={10} className="mr-1" />
+                {selectedSpot.detail.year}
+              </div>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="p-6 overflow-y-auto custom-scrollbar pb-10">
+              
+              {/* Detailed Sections */}
+              <div className="space-y-6">
+                
+                {/* 1. History */}
+                <div>
+                  <h3 className="text-sm font-bold text-[#1c1b1f] mb-2 flex items-center">
+                    <span className="w-1 h-4 bg-[#1a237e] rounded-full mr-2"></span>
+                    歷史沿革
+                  </h3>
+                  <p className="text-[14px] text-[#444746] leading-relaxed text-justify">
+                    {selectedSpot.detail.history}
+                  </p>
+                </div>
+
+                {/* 2. Must Visit (Visualized) */}
+                <div className="bg-[#f8f9fa] p-4 rounded-xl border border-slate-100">
+                  <h3 className="text-xs font-bold text-[#5f6368] uppercase tracking-wider mb-3 flex items-center">
+                    <Eye size={14} className="mr-1.5 text-[#1a237e]" />
+                    必看重點
+                  </h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {selectedSpot.mustVisit.map((item, idx) => (
+                      <div key={idx} className="bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-100 flex items-center gap-2">
+                        <Camera size={12} className="text-[#1a237e] shrink-0" />
+                        <span className="text-[12px] font-medium text-[#1c1b1f]">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. Features & Knowledge */}
+                <div>
+                  <h3 className="text-sm font-bold text-[#1c1b1f] mb-2 flex items-center">
+                    <span className="w-1 h-4 bg-[#1a237e] rounded-full mr-2"></span>
+                    特色與地位
+                  </h3>
+                  <p className="text-[14px] text-[#444746] leading-relaxed mb-4 text-justify">
+                    {selectedSpot.detail.features}
+                  </p>
+                  
+                  {/* Highlight Box */}
+                  <div className="bg-[#fff3e0] p-4 rounded-xl text-[#e65100] relative overflow-hidden border border-[#ffe0b2]">
+                    <div className="absolute -right-2 -top-2 text-[#ffcc80] opacity-30">
+                       <Star size={48} />
+                    </div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider mb-1 opacity-80">知識點</p>
+                    <p className="text-[13px] font-bold relative z-10 leading-snug">
+                      {selectedSpot.detail.highlight}
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Footer Info */}
+              <div className="mt-8 pt-4 border-t border-slate-100 flex justify-between items-center">
+                 <div className="flex items-center text-[#e65100] text-xs font-bold bg-[#fff0e0] px-3 py-1.5 rounded-lg">
+                    <Clock size={12} className="mr-1.5" />
+                    {selectedSpot.timeDisplay}
+                 </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
