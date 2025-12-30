@@ -1,106 +1,149 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>南京三日行程規劃</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lucide-react@latest/dist/umd/lucide.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+
         body {
-            font-family: 'Noto Sans TC', sans-serif;
+            font-family: 'Roboto', 'Noto Sans TC', sans-serif;
             -webkit-tap-highlight-color: transparent;
+            background-color: #fef7ff;
+            /* M3 Surface */
         }
-        
-        .custom-scrollbar {
-            scrollbar-width: thin;
-            scrollbar-color: #cbd5e1 #f1f5f9;
-        }
-        
+
+        /* Custom Scrollbar Hiding */
         .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
+            display: none;
         }
-        
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 3px;
+
+        .custom-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-        
-        .line-clamp-1 {
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 1;
-        }
-        
-        .animate-in {
-            animation-duration: 700ms;
-            animation-timing-function: ease-out;
-            animation-fill-mode: both;
-        }
-        
+
+        /* Animations */
         .fade-in {
-            animation-name: fadeIn;
+            animation: fadeIn 0.6s cubic-bezier(0.2, 0.0, 0, 1.0) forwards;
+            opacity: 0;
         }
-        
-        .slide-in-from-bottom {
-            animation-name: slideInFromBottom;
+
+        .slide-up {
+            animation: slideUp 0.6s cubic-bezier(0.2, 0.0, 0, 1.0) forwards;
         }
-        
+
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes slideInFromBottom {
             from {
-                transform: translateY(20px);
                 opacity: 0;
             }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
             to {
                 transform: translateY(0);
                 opacity: 1;
             }
         }
-        
-        .safe-area-top {
-            padding-top: env(safe-area-inset-top, 0);
+
+        /* Modal transitions */
+        .modal-enter {
+            transform: translateY(0) !important;
         }
-        
-        .selection\:bg-\[\#ffecb3\] ::selection {
-            background-color: #ffecb3;
+
+        .backdrop-enter {
+            opacity: 1 !important;
+            pointer-events: auto !important;
         }
-        
-        .selection\:text-\[\#5d4037\] ::selection {
-            color: #5d4037;
+
+        /* M3 Elevation & States */
+        .m3-card {
+            background-color: #f3f4f9;
+            /* Surface Container Low */
+            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+
+        .m3-card:active {
+            background-color: #e2e2e9;
+            /* Surface Container High */
+            transform: scale(0.98);
+        }
+
+        .m3-chip {
+            border: 1px solid transparent;
         }
     </style>
 </head>
-<body class="bg-[#f8f9fa]">
-    <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
-        const {
-            MapPin, Clock, X, Check, AlertCircle, ArrowRight, History,
-            MoreHorizontal, Eye, Camera, Star, ChevronUp, Share
-        } = lucide.icons;
+<body class="text-[#1d1b20] selection:bg-[#e8def8] selection:text-[#1d1b20] pb-24 touch-manipulation">
 
-        // 詳細數據源 (內容已擴充)
+    <!-- Small Top App Bar -->
+    <div
+        class="sticky top-0 z-20 bg-[#fef7ff]/95 backdrop-blur-md border-b border-[#cac4d0]/50 transition-all duration-200">
+        <div class="max-w-md mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <!-- Leading Icon (optional, could be menu) 
+               <button class="p-2 -ml-2 rounded-full hover:bg-[#1d1b20]/[0.08] active:bg-[#1d1b20]/[0.12]">
+                   <i data-lucide="menu" width="24"></i>
+               </button>
+               -->
+                <div class="flex flex-col">
+                    <h1 class="text-[22px] leading-7 font-normal text-[#1d1b20]">南京行程</h1>
+                    <p class="text-xs font-medium text-[#49454f] tracking-wide">Dec 29 - 31</p>
+                </div>
+            </div>
+
+            <button
+                class="w-10 h-10 rounded-full flex items-center justify-center text-[#49454f] hover:bg-[#1d1b20]/[0.08] active:bg-[#1d1b20]/[0.12] transition-colors">
+                <i data-lucide="share-2" width="24"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Schedule Container -->
+    <div id="app-container" class="px-4 pt-4 space-y-8 max-w-md mx-auto">
+        <!-- Content injected by JS -->
+    </div>
+
+    <!-- Scrim (Backdrop) -->
+    <div id="modal-backdrop" onclick="closeModal()"
+        class="fixed inset-0 z-50 bg-[#1d1b20]/40 backdrop-blur-[2px] transition-opacity duration-300 opacity-0 pointer-events-none">
+    </div>
+
+    <!-- Modal (Standard Bottom Sheet) -->
+    <div id="modal-sheet"
+        class="fixed inset-x-0 bottom-0 z-50 flex justify-center pointer-events-none transition-transform duration-400 ease-[cubic-bezier(0.2,0,0,1)] translate-y-full">
+        <!-- Material Surface Container Low/Lowest -->
+        <div
+            class="bg-[#f7f2fa] w-full max-w-md rounded-t-[28px] shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.15)] overflow-hidden relative flex flex-col max-h-[92vh] pointer-events-auto">
+
+            <!-- Drag Handle -->
+            <div class="w-full flex justify-center pt-4 pb-2" onclick="closeModal()">
+                <div class="w-8 h-1 bg-[#79747e] rounded-full opacity-40"></div>
+            </div>
+
+            <!-- Modal Content -->
+            <div id="modal-content" class="overflow-y-auto pb-12 custom-scrollbar">
+                <!-- Injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Data Source ---
         const scheduleData = [
             {
                 date: "12/29",
@@ -117,11 +160,11 @@
                                 shortDesc: "金陵明珠，皇家園林",
                                 mustVisit: ["環洲煙柳", "櫻洲花海", "菱洲", "從湖面看城牆"],
                                 detail: {
-                                    year: "始於秦漢 (前200年左右)",
+                                    year: "始於秦漢 (約西元前200年)",
                                     title: "中國僅存的江南皇家園林",
-                                    history: "玄武湖古名桑泊，距今已有兩千三百年歷史。六朝時期為皇家園林，操練水軍之所。明朝朱元璋定都南京後，將其闢為國家級檔案館（黃冊庫），嚴禁百姓入內，成為禁地長達260餘年。",
-                                    features: "湖岸呈菱形，周長約10公里，五洲（環洲、櫻洲、菱洲、梁洲、翠洲）分佈其中，洲洲堤橋相通，渾然一體。",
-                                    highlight: "這裡是中國歷代皇室保留最完整的城市湖泊公園，也是欣賞南京明城牆最美的角度之一。"
+                                    history: "玄武湖古名桑泊，至今已有兩千三百年歷史。六朝時期為皇家園林及操練水軍之所。明朝朱元璋定都南京後，將其闢為國家級檔案館（黃冊庫），成為禁地長達 260 餘年，直至清末才重新對外開放。這裡是歷代文人墨客與帝王將相流連之地，見證了南京城的繁華與滄桑。",
+                                    features: "湖岸呈菱形，周長約 10 公里，五洲分佈其中。這裡曾是明朝存放「黃冊」的聖地，也是世界上最早、最大的皇家檔案庫遺址。每逢夏日荷花盛開或秋日銀杏金黃，景色更是醉人。",
+                                    highlight: "這裡是中國歷代皇室保留最完整的城市湖泊公園，也是欣賞南京城牆最美的角度。特別推薦沿著環洲漫步，感受那份遠離塵囂的靜謐與皇家氣派。"
                                 }
                             },
                             {
@@ -129,32 +172,13 @@
                                 timeDisplay: "17:00 閉園",
                                 bookingStatus: null,
                                 shortDesc: "南朝四百八十寺之首",
-                                mustVisit: ["藥師佛塔", "古胭脂井", "素齋麵館", "櫻花大道(季節性)"],
+                                mustVisit: ["藥師佛塔", "古胭脂井", "素齋麵館", "櫻花大道"],
                                 detail: {
-                                    year: "始建於西晉永康元年 (300年)",
+                                    year: "始建於西晉永康元年 (西元300年)",
                                     title: "南朝第一寺，皇室佛緣",
-                                    history: "前身是三國東吳的棲玄寺。南朝梁武帝蕭衍在此興建同泰寺，曾四次捨身出家，不僅是佛教中心，更是南朝政治文化的焦點。歷經戰火毀損，現存建築多為明清及近代重建。",
-                                    features: "寺廟依山而建，層次分明。黃牆黑瓦的建築風格在南京眾多寺廟中獨樹一幟。藥師佛塔七層八面，是南京的地標之一。",
-                                    highlight: "「南朝四百八十寺，多少樓台煙雨中」這句詩最能代表這裡的意境。"
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        period: "下午/傍晚",
-                        spots: [
-                            {
-                                name: "明故宮遺址公園",
-                                timeDisplay: "18:30 閉園",
-                                bookingStatus: null,
-                                shortDesc: "北京故宮的藍本",
-                                mustVisit: ["午門五鳳樓", "奉天殿石基", "內五龍橋", "石柱礎"],
-                                detail: {
-                                    year: "始建於明洪武年間 (1366年)",
-                                    title: "中世紀世界最大的宮殿建築群",
-                                    history: "明故宮（南京紫禁城）是北京故宮的藍本，開創了明清兩代宮殿建築的規制。朱元璋在此登基，但在明成祖遷都北京後逐漸衰落，後經清軍入關及太平天國戰火，地面宏偉建築幾近全毀。",
-                                    features: "雖然僅存遺址，但從巨大的石柱礎和保留完整的午門，仍可想像當年的恢弘氣勢。整體佈局嚴謹，講究中軸對稱。",
-                                    highlight: "這裡是中國古代都城宮殿建築的集大成者，也是了解明初歷史的最佳實物檔案。"
+                                    history: "前身是三國東吳的棲玄寺，後成為南朝梁武帝蕭衍興建的同泰寺。梁武帝曾在此四次捨身出家，使這裡成為南朝佛教中心。古井「胭脂井」更是見證了陳後主與張麗華亡國前的最後時刻，充滿了歷史的唏噓。",
+                                    features: "寺廟依山而建，錯落有致，亮黃色的牆體與黑色的瓦片在南京的寺廟中獨樹一幟。藥師佛塔高聳入雲，是南京城北的地標建築。寺內的素麵館更是遠近馳名，湯頭鮮美。",
+                                    highlight: "「南朝四百八十寺，多少樓台煙雨中」，雞鳴寺即是這句千古絕唱的靈感來源與核心代表。香火極旺，據說求姻緣特別靈驗。"
                                 }
                             },
                             {
@@ -162,13 +186,41 @@
                                 timeDisplay: "21:00 閉園",
                                 bookingStatus: null,
                                 shortDesc: "世界第一大城垣",
-                                mustVisit: ["中華門甕城", "城磚銘文", "藏兵洞", "馬道"],
+                                mustVisit: ["登城口", "城磚銘文", "遠眺紫金山", "城牆博物館"],
                                 detail: {
-                                    year: "始建於1366年，歷時28年建成",
-                                    title: "世界最長、規模最大、保存最原真性的古代城垣",
-                                    history: "朱元璋採納朱升「高築牆」的建議興建。動用了全國5部162個縣的百姓，耗費城磚3.5億塊。它不僅是防禦工事，更是皇權的象徵。",
-                                    features: "中華門是中國現存最大的城堡式甕城，設計精巧，設有三道甕城和四道拱門，更有藏兵洞可容納三千甲士，展現了極高的軍事智慧。",
-                                    highlight: "每一塊城磚上都刻有監造官員和工匠的名字，建立了最早的「質量責任追究制」，是研究明代戶籍與文字的寶庫。"
+                                    year: "始建於西元1366年",
+                                    title: "世界最長、規模最大、保存最原真的古城垣",
+                                    history: "朱元璋採納朱升「高築牆」的建議，動用 162 個縣的百姓，耗費 3.5 億塊城磚，歷時 28 年建成。它不僅是一道軍事防線，更是皇權的絕對象徵。每一塊城磚都刻有燒製者與監造官的名字，建立了嚴格的責任追究制度。",
+                                    features: "南京城牆依山傍水而建，蜿蜒曲折，打破了傳統方正的城牆規制，展現了「天人合一」的設計理念。牆體厚實堅固，經歷六百多年風雨仍屹立不倒。",
+                                    highlight: "在城牆上漫步，一邊是現代化的都市高樓，一邊是滄桑的古色古香，古今交融的視覺衝擊令人震撼。推薦從雞鳴寺段登城，風景最佳。"
+                                }
+                            },
+                            {
+                                name: "明故宮遺址公園",
+                                timeDisplay: "18:30 閉園",
+                                bookingStatus: null,
+                                shortDesc: "北京故宮的藍本",
+                                mustVisit: ["午門五鳳樓", "奉天殿石基", "內五龍橋", "巨型石柱礎"],
+                                detail: {
+                                    year: "始建於明洪武年間 (西元1366年)",
+                                    title: "中世紀世界最大的宮殿建築群",
+                                    history: "明故宮是北京紫禁城的原型與藍本。朱元璋在此登基，開創了明清兩代宮殿建築的最高規格。雖然地面宏偉建築毀於戰火，但其佈局深刻影響了後世的都城規劃。",
+                                    features: "從現存保留完整的午門、內五龍橋和巨大的石柱礎，仍可想像當年的恢弘氣勢。午門的「五鳳樓」依舊巍峨，是明代宮殿建築的精華。",
+                                    highlight: "這裡是中國古代都城宮殿建築的集大成者，被譽為「北京故宮之母」。漫步在巨大的石基之間，彷彿能聽到歷史的迴響。"
+                                }
+                            },
+                            {
+                                name: "國民政府主席官邸",
+                                timeDisplay: "18:00 閉館",
+                                bookingStatus: "已預約",
+                                shortDesc: "美齡宮，遠東第一別墅",
+                                mustVisit: ["空中項鍊俯覽", "蔣宋臥室", "凱迪拉克", "地下廚房"],
+                                detail: {
+                                    year: "建成於1934年",
+                                    title: "蔣介石與宋美齡的官邸",
+                                    history: " formally 稱為「國民政府主席官邸」，因蔣介石與宋美齡常居於此，俗稱「美齡宮」。這裡不僅是他們的住所，也是接待外國貴賓的重要場所，見證了民國黃金十年的外交與政治生活。",
+                                    features: "建築風格中西合璧，外觀是傳統的中國宮殿式大屋頂，覆蓋綠色琉璃瓦，內部則是豪華的西式別墅裝修。最為人稱道的是，從高空俯瞰，陵園路兩旁的梧桐樹如同一條金色的項鍊，而美齡宮正是這條項鍊上璀璨的綠寶石。",
+                                    highlight: "被譽為「遠東第一別墅」，其設計細節極盡考究，展現了民國時期頂級的審美與工藝，是了解民國上層生活方式的絕佳窗口。"
                                 }
                             }
                         ]
@@ -177,17 +229,31 @@
                         period: "晚上",
                         spots: [
                             {
+                                name: "中華門 (甕城)",
+                                timeDisplay: "21:00 閉園",
+                                bookingStatus: null,
+                                shortDesc: "天下第一甕城",
+                                mustVisit: ["藏兵洞", "千斤閘遺跡", "馬道", "甕城結構"],
+                                detail: {
+                                    year: "建於明初 (西元1366年-1386年)",
+                                    title: "世界上保存最完整的地下軍事要塞",
+                                    history: "中華門原名聚寶門，是南京城牆十三座城門中最大的一座。其設計初衷是為了能在戰時「誘敵深入、聚而殲之」。這裡設有三道甕城、四道拱門，佈局嚴密驚人。",
+                                    features: "最令人驚嘆的是城門內的「藏兵洞」，共有 27 個，可容納 3,000 名伏兵。洞內冬暖夏涼，並設有通風口與傳聲孔，展現了極高的軍事智慧與建築工藝。",
+                                    highlight: "藏兵洞的規模與設計精密度為中國首位，親身走入洞中，能強烈感受到古代戰爭的緊張氛圍與防禦工事的宏大。"
+                                }
+                            },
+                            {
                                 name: "老門東",
                                 timeDisplay: "全天開放",
                                 bookingStatus: "推薦",
                                 shortDesc: "最南京的市井煙火",
-                                mustVisit: ["駿惠書屋", "金陵刻經處", "小吃街", "芥子園"],
+                                mustVisit: ["駿惠書屋", "金陵刻經處", "梅花糕", "芥子園"],
                                 detail: {
-                                    year: "歷史可追溯至三國時期",
-                                    title: "南京傳統民居聚集地",
-                                    history: "老門東位於南京城南中華門以東，自古就是江南商賈雲集、人文薈萃之地。這裡是南京傳統生活面貌保存最完整的地方，見證了南京老城南的興衰。",
-                                    features: "保留了大量明清風格的民居與街巷，馬頭牆、花格窗隨處可見。巷陌縱橫，充滿了濃厚的市井氣息。",
-                                    highlight: "除了建築，這裡匯集了幾乎所有南京地道小吃：梅花糕、雞汁湯包、鴨血粉絲湯，是味蕾的盛宴。"
+                                    year: "追溯至三國時期 (西元220年)",
+                                    title: "南京老城南的核心歷史街區",
+                                    history: "老門東位於中華門以東，自古是江南商賈雲集、人文薈萃之地。這裡是南京傳統民居保存最完整的區域，見證了老城南的商貿興盛與市井百態。",
+                                    features: "街區內保留了大量明清風格的民居，馬頭牆、石板路與花格窗隨處可見，構成了典型的蘇派建築風格。這裡還隱藏著許多文化遺產，如金陵刻經處。",
+                                    highlight: "這裡的「梅花糕」、「鴨血粉絲湯」與「小鄭酥燒餅」是公認的南京味蕾名片。在轉角遇見駿惠書屋（先鋒書店），則是另一番文化驚喜。"
                                 }
                             },
                             {
@@ -195,13 +261,13 @@
                                 timeDisplay: "全天開放",
                                 bookingStatus: "推薦",
                                 shortDesc: "中國四大文廟之一",
-                                mustVisit: ["大成殿", "江南貢院", "烏衣巷", "王導謝安紀念館"],
+                                mustVisit: ["大成殿", "江南貢院", "烏衣巷", "秦淮河夜景"],
                                 detail: {
-                                    year: "始建於東晉咸康三年 (337年)",
+                                    year: "始建於東晉 (西元337年)",
                                     title: "中國第一所國家最高學府",
-                                    history: "夫子廟是一組規模宏大的古建築群，由孔廟、學宮、貢院三大建築群組成。歷經多次毀建，現存建築多為清代晚期風格。",
-                                    features: "江南貢院曾是中國古代最大的科舉考場，明清時期半數以上的官員出自於此。大成殿內懸掛的「萬世師表」匾額極具歷史價值。",
-                                    highlight: "這裡不僅是儒家文化的中心，秦淮河畔的燈會更被譽為「秦淮燈彩甲天下」。"
+                                    history: "夫子廟是孔廟、學宮、貢院組成的龐大建築群。江南貢院曾是中國最大的科舉考場，明清時期全中國半數以上的狀元均出自於此。烏衣巷更是王導、謝安等豪門望族的居住地。",
+                                    features: "建築依秦淮河而建，形成了「廟在河邊，街在廟旁」的獨特佈局。這裡不僅是儒家文化的聖地，更是秦淮河畔世俗繁華的中心。",
+                                    highlight: "它是儒家文化與秦淮風情的完美融合。夜晚的夫子廟燈火輝煌，秦淮河上畫舫穿梭，是體驗「十里秦淮」夢幻景致的最佳地點。"
                                 }
                             }
                         ]
@@ -221,13 +287,13 @@
                                 timeDisplay: "17:00 閉館",
                                 bookingStatus: "已預約",
                                 shortDesc: "中國三大博物館之一",
-                                mustVisit: ["民國館 (地下)", "鎮館之寶：金獸", "金縷玉衣", "大報恩寺琉璃拱門"],
+                                mustVisit: ["民國館 (穿越時空)", "金獸 (鎮館之寶)", "大報恩寺琉璃拱門"],
                                 detail: {
                                     year: "創建於1933年",
-                                    title: "中國第一座由國家投資興建的大型綜合博物館",
-                                    history: "前身是蔡元培倡議建立的國立中央博物院籌備處。它是中國最早創建的博物館之一，與北京故宮、台北故宮並稱為「中國三大博物館」。",
-                                    features: "主殿仿遼代宮殿式建築，氣勢恢宏。最特別的是地下的「民國館」，真實還原了20世紀30年代南京的街道、火車站與店舖，彷彿穿越時空。",
-                                    highlight: "館藏文物43萬餘件，其中江蘇地區出土的考古文物是其強項。"
+                                    title: "中國第一座由國家投資興建的大型博物館",
+                                    history: "前身是蔡元培倡議的國立中央博物院，與北京故宮、台北故宮並稱為中國三大博物館。館藏文物超過 43 萬件，是中國近代考古學與博物館學的發祥地之一。",
+                                    features: "博物院分為歷史館、特展館、數字館、藝術館、民國館、非遺館六大展館。其中地下「民國館」最為獨特，完整還原了 1930 年代南京的街景，包括老火車站、郵局與店鋪。",
+                                    highlight: "「民國館」提供完全沉浸式的體驗，讓人瞬間穿越回民國時期。鎮館之寶「金獸」與「釉裡紅歲寒三友紋梅瓶」更是稀世珍寶，不可錯過。"
                                 }
                             }
                         ]
@@ -241,13 +307,13 @@
                                 bookingStatus: "已預約",
                                 note: "黃炘苡手機",
                                 shortDesc: "半部近代史",
-                                mustVisit: ["子超樓", "煦園 (西花園)", "孫中山起居室", "行政院大樓"],
+                                mustVisit: ["子超樓", "煦園", "孫中山臨時大總統辦公室", "行政院大樓"],
                                 detail: {
-                                    year: "明朝漢王府 -> 清朝兩江總督署 -> 民國總統府",
+                                    year: "明漢王府、清總督署、民國總統府",
                                     title: "中國近代史遺存博物館",
-                                    history: "這塊地承載了太多的歷史：明朝是漢王府，清朝是康熙乾隆下江南的行宮及兩江總督署，太平天國時期是洪秀全的天王府，民國時期則是國民政府總統府。",
-                                    features: "建築風格中西合璧，既有江南園林的精緻（煦園），又有民國官署的莊嚴（子超樓）。",
-                                    highlight: "在「子超樓」可以看到當年蔣介石、李宗仁的辦公室原貌，以及孫中山先生手書的「天下為公」。"
+                                    history: "這塊土地的歷史極其厚重：明朝是漢王府，清朝是康熙乾隆下江南的行宮及兩江總督署，太平天國這裡是天王府，民國時期則是國民政府總統府。孫中山先生也在此就任臨時大總統。",
+                                    features: "建築風格極其複雜而精彩，既有江南園林「煦園」的婉約精緻，又有歐式政務大樓「子超樓」的莊嚴肅穆，是中西文化與多個朝代共存的建築標本。",
+                                    highlight: "走進「子超樓」，可以看到當年蔣介石、李宗仁的辦公室原貌。這裡的每一磚一瓦都訴說著中國近代百年的風雲變幻，是必讀的歷史教科書。"
                                 }
                             },
                             {
@@ -255,13 +321,13 @@
                                 timeDisplay: "17:00 閉館",
                                 bookingStatus: "待預約",
                                 shortDesc: "勿忘國恥，和平之聲",
-                                mustVisit: ["萬人坑遺址", "12秒水滴裝置", "和平女神像", "史料陳列廳"],
+                                mustVisit: ["萬人坑遺址", "12秒水滴", "和平女神像", "冥思廳"],
                                 detail: {
                                     year: "建成於1985年",
                                     title: "中國首批國家一級博物館",
-                                    history: "全名為侵華日軍南京大屠殺遇難同胞紀念館，選址於當年日軍大屠殺的遺址之一「江東門萬人坑」之上。",
-                                    features: "建築採用灰白色調，外形如同這片土地上的一塊斷裂的刀，營造出莊嚴肅穆、壓抑但又充滿力量的氛圍。",
-                                    highlight: "著名的「12秒」水滴聲裝置，象徵每12秒就有一個生命在戰爭中消逝，極具震撼力。"
+                                    history: "全名為侵華日軍南京大屠殺遇難同胞紀念館，選址於當年日軍大屠殺遺址之一的「江東門萬人坑」。這是一座關於傷痛、記憶、反思與和平的紀念性建築。",
+                                    features: "建築設計以「生與死」、「痛與恨」為主題，大量採用灰白石材與碎石，外形如同斷裂的軍刀。內部設計冷峻肅穆，視覺與心靈的衝擊力極強。",
+                                    highlight: "著名的「12秒水滴」裝置，每隔12秒滴落一滴水，象徵著在常規大屠殺期間每12秒就有一個生命消逝，令人震撼且悲痛，是銘記歷史、祈願和平的聖地。"
                                 }
                             }
                         ]
@@ -270,17 +336,17 @@
                         period: "晚上",
                         spots: [
                             {
-                                name: "秦淮河",
+                                name: "南京長江大橋",
                                 timeDisplay: "全天開放",
-                                bookingStatus: "推薦",
-                                shortDesc: "南京的母親河",
-                                mustVisit: ["畫舫夜遊", "桃葉渡", "白鷺洲公園", "東水關"],
+                                bookingStatus: null,
+                                shortDesc: "中國人的爭氣橋",
+                                mustVisit: ["橋頭堡", "公鐵兩用橋面", "玉蘭花路燈", "玻璃棧道"],
                                 detail: {
-                                    year: "千古傳唱",
-                                    title: "中國第一歷史文化名河",
-                                    history: "「煙籠寒水月籠沙，夜泊秦淮近酒家」。秦淮河孕育了南京的古老文化，六朝金粉之地，明清時期更是江南科舉與商業中心。",
-                                    features: "夜間的秦淮河是南京最美的一面，兩岸的馬頭牆在燈光映襯下倒映水中，畫舫穿梭其間。",
-                                    highlight: "建議乘坐畫舫遊覽，從水路視角體驗「槳聲燈影裡的秦淮河」，感受古人的風雅。"
+                                    year: "1968年全面通車",
+                                    title: "第一座由中國自行設計建造的雙層鐵路、公路兩用橋",
+                                    history: "在1960年代中蘇關係破裂、蘇聯撤走專家且物資匱乏的艱難背景下，中國人靠自己的力量建成了這座奇蹟。它不僅是長江上重要的交通樞紐，更是那個時代自力更生精神的圖騰。",
+                                    features: "大橋分為上下兩層，上層為公路，下層為鐵路。橋頭堡上高聳的工農兵雕塑極具鮮明的時代特色。公路兩側排列著 299 根玉蘭花形狀的路燈，夜晚亮燈時如同一條火龍。",
+                                    highlight: "站在橋頭堡俯瞰滾滾長江東逝水，氣勢磅礴。這座橋承載了幾代人的集體記憶，被視為南京乃至中國的驕傲。"
                                 }
                             }
                         ]
@@ -299,14 +365,14 @@
                                 name: "中山陵",
                                 timeDisplay: "17:00 閉園",
                                 bookingStatus: "待預約",
-                                shortDesc: "中國近代建築史上的第一陵",
-                                mustVisit: ["博愛坊", "392級台階", "祭堂", "天下為公匾額"],
+                                shortDesc: "近代建築史上的第一陵",
+                                mustVisit: ["博愛坊", "392級台階", "祭堂坐像", "天下為公匾"],
                                 detail: {
                                     year: "建成於1929年",
-                                    title: "中國近代民主革命先行者孫中山的陵墓",
-                                    history: "孫中山先生逝世後，遵照其遺願葬於南京紫金山。陵墓設計通過國際競賽，由建築師呂彥直設計，融合了中西建築精華。",
-                                    features: "整個建築群依山而建，中軸對稱。從空中俯瞰，整個陵墓像一座平臥在綠絨毯上的「自由鐘」。392級台階象徵著當時中國3億9千2百萬同胞。",
-                                    highlight: "祭堂內的孫中山大理石坐像是波蘭雕刻家保羅·蘭多斯基的作品。雖然墓室現已不開放，但祭堂的莊嚴氛圍仍令人肅然起敬。"
+                                    title: "孫中山先生陵墓，國之聖地",
+                                    history: "孫中山先生逝世後，遵照其遺願葬於南京紫金山。陵墓由建築師呂彥直設計，融合了中國古代宮殿建築與西方現代建築美學。整個陵寢依山而建，氣勢宏偉。",
+                                    features: "從空中俯瞰，整個陵墓平面呈「自由鐘」狀，寓意喚起民眾。從博愛坊到祭堂，共有 392 級台階，象徵當時中國的三億九千兩百萬同胞。",
+                                    highlight: "它是中國近代建築史上最傑出的範例之一。登上最高處回望，視野開闊，既能感受到建築的莊嚴肅穆，也能緬懷孫中山先生的偉大精神。"
                                 }
                             },
                             {
@@ -314,41 +380,27 @@
                                 timeDisplay: "18:00 閉園",
                                 bookingStatus: null,
                                 shortDesc: "明清皇家陵寢之首",
-                                mustVisit: ["石象路 (最美600米)", "文武方門", "方城明樓", "寶頂"],
+                                mustVisit: ["石象路", "文武方門", "方城明樓", "寶頂"],
                                 detail: {
-                                    year: "始建於1381年",
+                                    year: "始建於西元1381年",
                                     title: "中國古代最大的帝王陵寢之一",
-                                    history: "明太祖朱元璋與馬皇后的合葬陵墓。耗費巨資與人力，歷時30餘年建成。清代康熙、乾隆下江南時均親往祭掃，以示統治的正統性。",
-                                    features: "神道石刻保存完好，尤其是石象路，兩旁的石獸威嚴聳立，配上秋季的梧桐與銀杏，被譽為「南京最美600米」。",
-                                    highlight: "開創了明清皇陵「前方後圓」的陵寢規制，對後世五百年的帝陵形制產生了深遠影響。"
+                                    history: "明太祖朱元璋與馬皇后的合葬陵墓。耗費巨資與人力，歷時 30 餘年才建成。清代康熙、乾隆下江南時均曾親往祭掃，以示對明朝正統的尊重。",
+                                    features: "神道石刻是南京最美的風景之一，尤其是石象路，兩旁的石獸威嚴聳立，配上秋季的梧桐與銀杏，美不勝收。陵寢佈局宏大，規制嚴謹。",
+                                    highlight: "明孝陵開創了明清皇陵「前方後圓」的陵寢規制，對後世五百年的帝陵形制產生了深遠影響，被列為世界文化遺產。"
                                 }
                             },
                             {
                                 name: "蔣陵 (孫權墓)",
                                 timeDisplay: "全天開放",
                                 bookingStatus: null,
-                                shortDesc: "三國大帝孫權之墓",
-                                mustVisit: ["梅花山", "孫權石像", "梅花妝韻"],
+                                shortDesc: "三國大帝長眠處",
+                                mustVisit: ["梅花山步道", "孫權紀念館", "石像生"],
                                 detail: {
-                                    year: "三國時期",
+                                    year: "三國時期 (約西元252年)",
                                     title: "南京地區最早的帝王陵墓",
-                                    history: "位於梅花山，據傳朱元璋建明孝陵時，為了神道的走向，特意保留了孫權墓，霸氣地說：「孫權也是一條好漢，留著給我看門吧」。",
-                                    features: "雖然地表建築已無存，但梅花山作為南京賞梅勝地，其地下長眠著這位東吳大帝，增添了歷史的厚重感。",
-                                    highlight: "春天時萬株梅花盛開，與歷史遺跡交相輝映。"
-                                }
-                            },
-                            {
-                                name: "國民政府主席官邸",
-                                timeDisplay: "18:00 閉館",
-                                bookingStatus: "已預約",
-                                shortDesc: "美齡宮，遠東第一別墅",
-                                mustVisit: ["空中項鍊視角", "凱迪拉克停放處", "蔣宋臥室", "地下廚房"],
-                                detail: {
-                                    year: "建成於1934年",
-                                    title: "遠東第一別墅",
-                                    history: "正式名稱為「國民政府主席官邸」，因蔣介石與宋美齡常居於此，俗稱「美齡宮」。曾作為國民政府官員拜謁中山陵的休息處。",
-                                    features: "建築風格中西合璧，外觀是傳統宮殿式大屋頂，內部則是西式別墅裝潢。最為人稱道的是，從高空俯瞰，陵園路兩旁的梧桐樹如同一條項鍊，而美齡宮正是項鍊上的那顆綠寶石。",
-                                    highlight: "內部的裝飾極盡考究，展現了民國時期的頂級審美與生活方式。"
+                                    history: "位於梅花山。傳說朱元璋建明孝陵時，為了神道走向，本應遷走孫權墓，但他佩服孫權是條好漢，特意下令「孫權也是一條好漢，留著給我看門吧」，將其保留在神道之側。",
+                                    features: "雖無地上宏偉建築，但梅花山本身就是一座巨大的陵墓封土。這裡如今是南京著名的賞梅勝地，古蹟與自然景觀完美結合。",
+                                    highlight: "在梅花盛開的季節，花海之下長眠著這位東吳大帝，歷史的厚重與自然的浪漫在此交會，令人遐想。"
                                 }
                             }
                         ]
@@ -357,402 +409,260 @@
             }
         ];
 
-        // 組件：時間狀態徽章
-        const TimeStatusBadge = ({ time }) => {
-            const isAlwaysOpen = time.includes("全天");
-            const baseClasses = "inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wide shadow-sm";
-            
-            if (isAlwaysOpen) {
-                return React.createElement('span', {
-                    className: `${baseClasses} bg-[#f0f1f3] text-[#444746]`
-                }, [
-                    React.createElement(Clock, { key: 'icon', size: 11, className: "mr-1" }),
-                    time
-                ]);
-            }
-            // 按照要求，閉園時間使用橘色
-            return React.createElement('span', {
-                className: `${baseClasses} bg-[#fff0e0] text-[#e65100]`
-            }, [
-                React.createElement(Clock, { key: 'icon', size: 11, className: "mr-1" }),
-                time
-            ]);
-        };
+        // --- Render Helpers ---
 
-        // 組件：預約狀態徽章
-        const BookingBadge = ({ status, note }) => {
-            if (!status && !note) return null;
-            
-            let bgClass = "";
-            let textClass = "";
-            let icon = null;
+        function renderTimeBadge(time) {
+            // M3 Assist Chip Style
+            const isAlwaysOpen = time.includes("全天") || time.includes("常開");
+
+            // bg-surface-container-high / text-on-surface-variant
+            const baseClasses = "inline-flex items-center px-3 py-1.5 rounded-lg text-[11px] font-medium tracking-wide transition-all border border-[#79747e]/20";
+
+            // For closed times/warnings, use Error Container
+            const containerClass = isAlwaysOpen
+                ? "bg-transparent text-[#49454f]"
+                : "bg-[#ffdad6] text-[#410002] border-[#ffdad6]"; // Error Container
+
+            return `
+                <span class="${baseClasses} ${containerClass}">
+                    <i data-lucide="clock" width="12" class="mr-1.5"></i>
+                    ${time}
+                </span>
+            `;
+        }
+
+        function renderBookingBadge(status, note) {
+            if (!status && !note) return '';
+
+            // M3 Filter Chip / Suggestion Chip aesthetics
+            let bgClass, textClass, icon;
 
             if (status === "已預約") {
-                bgClass = "bg-[#d1e7dd] text-[#0f5132]";
-                icon = React.createElement(Check, { size: 11, className: "mr-1" });
+                // Secondary Container
+                bgClass = "bg-[#e8def8]";
+                textClass = "text-[#1d192b]";
+                icon = "check";
             } else if (status === "待預約") {
-                bgClass = "bg-[#f8d7da] text-[#842029]";
-                icon = React.createElement(AlertCircle, { size: 11, className: "mr-1" });
-            } else { // 推薦
-                bgClass = "bg-[#fff3cd] text-[#664d03]";
-                icon = React.createElement(Star, { size: 11, className: "mr-1" });
+                // Tertiary Container
+                bgClass = "bg-[#ffd8e4]";
+                textClass = "text-[#31111d]";
+                icon = "alert-circle";
+            } else { // 推薦 (Recommend) - Primary Container
+                bgClass = "bg-[#eaddff]";
+                textClass = "text-[#21005d]";
+                icon = "star";
             }
 
-            return React.createElement('div', {
-                className: "flex flex-col items-end gap-1.5 mb-2"
-            }, [
-                status && React.createElement('span', {
-                    key: 'status',
-                    className: `inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold shadow-sm ${bgClass} ${textClass}`
-                }, [icon, status]),
-                note && React.createElement('span', {
-                    key: 'note',
-                    className: "text-[10px] text-[#854d0e] bg-[#fef3c7] px-2 py-0.5 rounded-md font-medium border border-[#fde68a]"
-                }, note)
-            ]);
-        };
+            let html = '<div class="flex flex-col items-end gap-2 mb-2">';
 
-        const NanjingItineraryMobile = () => {
-            const [selectedSpot, setSelectedSpot] = useState(null);
-            const [isClosing, setIsClosing] = useState(false);
+            if (status) {
+                html += `
+                    <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium ${bgClass} ${textClass}">
+                        <i data-lucide="${icon}" width="14" class="mr-1.5"></i>
+                        ${status}
+                    </span>
+                `;
+            }
 
-            // 處理關閉動畫
-            const handleClose = () => {
-                setIsClosing(true);
-                setTimeout(() => {
-                    setSelectedSpot(null);
-                    setIsClosing(false);
-                }, 300);
-            };
+            if (note) {
+                // Surface Variant
+                html += `
+                    <span class="text-[10px] text-[#49454f] bg-[#e7e0ec] px-2 py-1 rounded-md font-medium">
+                        ${note}
+                    </span>
+                `;
+            }
 
-            // 防止背景滾動
-            useEffect(() => {
-                if (selectedSpot) {
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    document.body.style.overflow = 'unset';
+            html += '</div>';
+            return html;
+        }
+
+        function findSpot(name) {
+            for (const day of scheduleData) {
+                for (const section of day.sections) {
+                    for (const spot of section.spots) {
+                        if (spot.name === name) return spot;
+                    }
                 }
-                return () => { document.body.style.overflow = 'unset'; };
-            }, [selectedSpot]);
+            }
+            return null;
+        }
 
-            return React.createElement('div', {
-                className: "min-h-screen bg-[#f8f9fa] font-sans pb-24 selection:bg-[#ffecb3] selection:text-[#5d4037] touch-manipulation"
-            }, [
-                // Mobile Header
-                React.createElement('div', {
-                    key: 'header',
-                    className: "sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-slate-100 safe-area-top"
-                }, React.createElement('div', {
-                    className: "px-5 h-14 flex items-center justify-between"
-                }, [
-                    React.createElement('div', {
-                        key: 'header-left',
-                        className: "flex items-center gap-3"
-                    }, [
-                        React.createElement('div', {
-                            key: 'logo',
-                            className: "w-9 h-9 rounded-full bg-[#1a237e] text-white flex items-center justify-center font-bold text-lg shadow-sm"
-                        }, "京"),
-                        React.createElement('div', { key: 'title' }, [
-                            React.createElement('h1', {
-                                key: 'main-title',
-                                className: "text-lg font-bold text-[#1c1b1f] leading-none"
-                            }, "南京三日"),
-                            React.createElement('p', {
-                                key: 'subtitle',
-                                className: "text-[10px] text-[#49454f] mt-0.5 font-medium uppercase tracking-wide"
-                            }, "Dec 29 - 31")
-                        ])
-                    ]),
-                    React.createElement('button', {
-                        key: 'share-btn',
-                        className: "w-9 h-9 rounded-full bg-slate-50 text-slate-600 flex items-center justify-center active:bg-slate-200 transition-colors"
-                    }, React.createElement(Share, { size: 18 }))
-                ])),
+        // --- Main Render Function ---
 
-                // Main Content
-                React.createElement('div', {
-                    key: 'content',
-                    className: "px-4 pt-6 space-y-8 max-w-md mx-auto"
-                }, scheduleData.map((day, index) => 
-                    React.createElement('div', {
-                        key: index,
-                        className: "animate-in fade-in slide-in-from-bottom-6 duration-700",
-                        style: { animationDelay: `${index * 100}ms` }
-                    }, [
-                        // Date Header
-                        React.createElement('div', {
-                            key: 'date-header',
-                            className: "mb-4 px-1 flex items-baseline justify-between"
-                        }, [
-                            React.createElement('div', {
-                                key: 'date-left',
-                                className: "flex items-baseline gap-2"
-                            }, [
-                                React.createElement('h2', {
-                                    key: 'date',
-                                    className: "text-2xl font-bold text-[#1c1b1f] tracking-tight"
-                                }, day.date),
-                                React.createElement('span', {
-                                    key: 'day',
-                                    className: "text-xs font-bold text-[#1a237e] bg-[#e8eaf6] px-2 py-0.5 rounded-full"
-                                }, day.day)
-                            ]),
-                            React.createElement('p', {
-                                key: 'theme',
-                                className: "text-[#5f6368] text-xs font-medium italic"
-                            }, day.theme)
-                        ]),
+        function renderApp() {
+            const container = document.getElementById('app-container');
+            let html = '';
 
-                        // Timeline content
-                        React.createElement('div', {
-                            key: 'timeline',
-                            className: "space-y-4"
-                        }, day.sections.map((section, sIndex) =>
-                            React.createElement('div', {
-                                key: sIndex,
-                                className: "relative"
-                            }, [
-                                // Period Label
-                                React.createElement('div', {
-                                    key: 'period-label',
-                                    className: "flex items-center mb-3"
-                                }, [
-                                    React.createElement('div', {
-                                        key: 'divider',
-                                        className: "w-1 h-3 bg-[#1a237e] rounded-full mr-2"
-                                    }),
-                                    React.createElement('h3', {
-                                        key: 'period',
-                                        className: "text-xs font-bold text-[#5f6368] uppercase tracking-wider"
-                                    }, section.period)
-                                ]),
+            scheduleData.forEach((day, dayIdx) => {
+                const delayStr = `${dayIdx * 120}ms`;
 
-                                // Spots
-                                React.createElement('div', {
-                                    key: 'spots',
-                                    className: "space-y-3 pl-3 border-l border-slate-200 ml-1.5 pb-2"
-                                }, section.spots.map((spot, spotIndex) =>
-                                    React.createElement('div', {
-                                        key: spotIndex,
-                                        onClick: () => setSelectedSpot(spot),
-                                        className: "group bg-white active:bg-slate-50 active:scale-[0.98] transition-all duration-200 rounded-2xl p-4 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] border border-slate-100 cursor-pointer relative overflow-hidden ml-2"
-                                    }, React.createElement('div', {
-                                        className: "flex justify-between items-start relative z-10"
-                                    }, [
-                                        // Left: Content
-                                        React.createElement('div', {
-                                            key: 'left',
-                                            className: "flex-1 mr-2"
-                                        }, [
-                                            React.createElement('h4', {
-                                                key: 'name',
-                                                className: "text-[17px] font-bold text-[#1c1b1f] mb-1 leading-tight flex items-center"
-                                            }, [
-                                                spot.name,
-                                                React.createElement(ChevronUp, {
-                                                    key: 'chevron',
-                                                    size: 16,
-                                                    className: "text-slate-300 ml-1 rotate-90"
-                                                })
-                                            ]),
-                                            React.createElement('p', {
-                                                key: 'desc',
-                                                className: "text-[13px] text-[#5f6368] leading-snug mb-2 line-clamp-1"
-                                            }, spot.shortDesc),
-                                            React.createElement(TimeStatusBadge, {
-                                                key: 'time',
-                                                time: spot.timeDisplay
-                                            })
-                                        ]),
-                                        
-                                        // Right: Booking Status
-                                        React.createElement('div', {
-                                            key: 'right',
-                                            className: "flex flex-col items-end shrink-0"
-                                        }, React.createElement(BookingBadge, {
-                                            status: spot.bookingStatus,
-                                            note: spot.note
-                                        }))
-                                    ]))
-                                ))
-                            ])
-                        ))
-                    ])
-                )),
+                html += `
+                <div class="fade-in slide-up" style="animation-delay: ${delayStr}">
+                    <!-- Date Header (Headline Small) -->
+                    <div class="mb-5 pl-1 flex items-baseline gap-3">
+                        <span class="text-3xl font-normal text-[#1d1b20]">${day.date}</span>
+                        <span class="text-sm font-medium text-[#6750a4] bg-[#e8def8] px-2 py-0.5 rounded-md">${day.day}</span>
+                        <span class="text-xs text-[#49454f] font-medium tracking-wide uppercase ml-auto">${day.theme}</span>
+                    </div>
 
-                // Mobile Bottom Sheet Modal
-                selectedSpot && React.createElement('div', {
-                    key: 'modal',
-                    className: "fixed inset-0 z-50 flex items-end justify-center sm:items-center"
-                }, [
-                    // Backdrop
-                    React.createElement('div', {
-                        key: 'backdrop',
-                        className: `absolute inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`,
-                        onClick: handleClose
-                    }),
-                    
-                    // Sheet Content
-                    React.createElement('div', {
-                        key: 'sheet',
-                        className: `bg-white w-full max-w-md sm:rounded-[28px] rounded-t-[28px] shadow-2xl overflow-hidden relative flex flex-col max-h-[90vh] transition-transform duration-300 transform ${isClosing ? 'translate-y-full' : 'translate-y-0'} animate-in slide-in-from-bottom`
-                    }, [
-                        // Sheet Handle (Mobile visual cue)
-                        React.createElement('div', {
-                            key: 'handle',
-                            className: "w-full flex justify-center pt-3 pb-1 bg-[#f0f4f8] sm:hidden",
-                            onClick: handleClose
-                        }, React.createElement('div', {
-                            className: "w-12 h-1.5 bg-slate-300 rounded-full"
-                        })),
+                    <!-- Timeline / List items -->
+                    <div class="space-y-4 pl-4 border-l-2 border-[#e7e0ec] ml-1.5">
+                        ${day.sections.map(section => `
+                            <div class="relative">
+                                <h3 class="text-xs font-medium text-[#49454f] uppercase tracking-wider mb-2 pl-2">
+                                    ${section.period}
+                                </h3>
 
-                        // Header Area
-                        React.createElement('div', {
-                            key: 'modal-header',
-                            className: "bg-[#f0f4f8] px-6 pb-6 pt-2 relative shrink-0"
-                        }, [
-                            React.createElement('button', {
-                                key: 'close-btn',
-                                onClick: handleClose,
-                                className: "absolute top-4 right-4 p-2 bg-white/60 rounded-full text-slate-700 active:bg-white transition-colors"
-                            }, React.createElement(X, { size: 20 })),
-                            
-                            React.createElement('div', {
-                                key: 'location',
-                                className: "flex items-center text-[#1a237e] text-xs font-bold mb-2"
-                            }, [
-                                React.createElement(MapPin, { key: 'pin', size: 12, className: "mr-1" }),
-                                "南京"
-                            ]),
-                            
-                            React.createElement('h2', {
-                                key: 'spot-name',
-                                className: "text-2xl font-bold text-[#1c1b1f] leading-tight mb-1"
-                            }, selectedSpot.name),
-                            
-                            React.createElement('div', {
-                                key: 'year-badge',
-                                className: "inline-flex items-center bg-[#1a237e] text-white px-2 py-0.5 rounded text-[10px] font-bold tracking-wide"
-                            }, [
-                                React.createElement(History, { key: 'history', size: 10, className: "mr-1" }),
-                                selectedSpot.detail.year
-                            ])
-                        ]),
+                                <div class="space-y-3">
+                                    ${section.spots.map(spot => `
+                                        <div onclick="openModal('${spot.name}')"
+                                             class="m3-card relative overflow-hidden rounded-[20px] p-4 cursor-pointer">
+                                            
+                                            <!-- Ripple Target (handled by CSS active state) -->
+                                            <div class="flex justify-between items-start">
+                                                <div class="flex-1 mr-4">
+                                                    <h4 class="text-lg font-medium text-[#1d1b20] mb-1">
+                                                        ${spot.name}
+                                                    </h4>
+                                                    <p class="text-sm text-[#49454f] leading-relaxed mb-3 line-clamp-1">
+                                                        ${spot.shortDesc}
+                                                    </p>
+                                                    ${renderTimeBadge(spot.timeDisplay)}
+                                                </div>
+                                                
+                                                <div class="flex flex-col items-end">
+                                                    ${renderBookingBadge(spot.bookingStatus, spot.note)}
+                                                    
+                                                    <!-- Icon Button (Standard) -->
+                                                    <div class="mt-1 w-8 h-8 rounded-full flex items-center justify-center text-[#49454f] bg-[#e7e0ec]/50">
+                                                        <i data-lucide="chevron-right" width="20"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                `;
+            });
 
-                        // Scrollable Content
-                        React.createElement('div', {
-                            key: 'modal-content',
-                            className: "p-6 overflow-y-auto custom-scrollbar pb-10"
-                        }, React.createElement('div', {
-                            className: "space-y-6"
-                        }, [
-                            // 1. History
-                            React.createElement('div', {
-                                key: 'history-section'
-                            }, [
-                                React.createElement('h3', {
-                                    key: 'history-title',
-                                    className: "text-sm font-bold text-[#1c1b1f] mb-2 flex items-center"
-                                }, [
-                                    React.createElement('span', {
-                                        key: 'divider',
-                                        className: "w-1 h-4 bg-[#1a237e] rounded-full mr-2"
-                                    }),
-                                    "歷史沿革"
-                                ]),
-                                React.createElement('p', {
-                                    key: 'history-content',
-                                    className: "text-[14px] text-[#444746] leading-relaxed text-justify"
-                                }, selectedSpot.detail.history)
-                            ]),
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
 
-                            // 2. Must Visit
-                            React.createElement('div', {
-                                key: 'must-visit',
-                                className: "bg-[#f8f9fa] p-4 rounded-xl border border-slate-100"
-                            }, [
-                                React.createElement('h3', {
-                                    key: 'must-visit-title',
-                                    className: "text-xs font-bold text-[#5f6368] uppercase tracking-wider mb-3 flex items-center"
-                                }, [
-                                    React.createElement(Eye, { key: 'eye', size: 14, className: "mr-1.5 text-[#1a237e]" }),
-                                    "必看重點"
-                                ]),
-                                React.createElement('div', {
-                                    key: 'must-visit-grid',
-                                    className: "grid grid-cols-2 gap-2"
-                                }, selectedSpot.mustVisit.map((item, idx) =>
-                                    React.createElement('div', {
-                                        key: idx,
-                                        className: "bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-100 flex items-center gap-2"
-                                    }, [
-                                        React.createElement(Camera, { key: 'camera', size: 12, className: "text-[#1a237e] shrink-0" }),
-                                        React.createElement('span', {
-                                            key: 'text',
-                                            className: "text-[12px] font-medium text-[#1c1b1f]"
-                                        }, item)
-                                    ])
-                                ))
-                            ]),
+        // --- Modal Logic ---
 
-                            // 3. Features & Highlight
-                            React.createElement('div', {
-                                key: 'features'
-                            }, [
-                                React.createElement('h3', {
-                                    key: 'features-title',
-                                    className: "text-sm font-bold text-[#1c1b1f] mb-2 flex items-center"
-                                }, [
-                                    React.createElement('span', {
-                                        key: 'divider',
-                                        className: "w-1 h-4 bg-[#1a237e] rounded-full mr-2"
-                                    }),
-                                    "特色與地位"
-                                ]),
-                                React.createElement('p', {
-                                    key: 'features-content',
-                                    className: "text-[14px] text-[#444746] leading-relaxed mb-4 text-justify"
-                                }, selectedSpot.detail.features),
-                                
-                                // Highlight Box
-                                React.createElement('div', {
-                                    key: 'highlight',
-                                    className: "bg-[#fff3e0] p-4 rounded-xl text-[#e65100] relative overflow-hidden border border-[#ffe0b2]"
-                                }, [
-                                    React.createElement('div', {
-                                        key: 'star-bg',
-                                        className: "absolute -right-2 -top-2 text-[#ffcc80] opacity-30"
-                                    }, React.createElement(Star, { size: 48 })),
-                                    React.createElement('p', {
-                                        key: 'highlight-label',
-                                        className: "text-[10px] font-bold uppercase tracking-wider mb-1 opacity-80"
-                                    }, "知識點"),
-                                    React.createElement('p', {
-                                        key: 'highlight-content',
-                                        className: "text-[13px] font-bold relative z-10 leading-snug"
-                                    }, selectedSpot.detail.highlight)
-                                ])
-                            ])
-                        ])),
+        function openModal(spotName) {
+            const spot = findSpot(spotName);
+            if (!spot) return;
 
-                        // Footer Info
-                        React.createElement('div', {
-                            key: 'footer',
-                            className: "mt-8 pt-4 border-t border-slate-100 flex justify-between items-center"
-                        }, React.createElement('div', {
-                            className: "flex items-center text-[#e65100] text-xs font-bold bg-[#fff0e0] px-3 py-1.5 rounded-lg"
-                        }, [
-                            React.createElement(Clock, { key: 'clock', size: 12, className: "mr-1.5" }),
-                            selectedSpot.timeDisplay
-                        ]))
-                    ])
-                ])
-            ]);
-        };
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `
+                <!-- Header (Headline) -->
+                <div class="px-6 pb-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1 pr-4">
+                            <div class="flex items-center text-[#6750a4] text-[11px] font-medium tracking-widest uppercase mb-1">
+                                <i data-lucide="map-pin" width="12" class="mr-1.5"></i>
+                                NANJING
+                            </div>
+                            <h2 class="text-[28px] font-normal text-[#1d1b20] leading-tight mb-2">${spot.name}</h2>
+                            <span class="inline-flex items-center bg-[#6750a4] text-white px-2.5 py-1 rounded-md text-xs font-medium">
+                                ${spot.detail.year}
+                            </span>
+                        </div>
+                        
+                        <!-- Close Button (Icon Button) -->
+                        <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-[#f3f4f9] text-[#49454f] flex items-center justify-center active:bg-[#e7e0ec]">
+                            <i data-lucide="x" width="24"></i>
+                        </button>
+                    </div>
 
-        // 渲染應用
-        ReactDOM.render(React.createElement(NanjingItineraryMobile), document.getElementById('root'));
+                    <div class="space-y-6 mt-4">
+                        <!-- History Section -->
+                        <section>
+                            <h3 class="text-sm font-medium text-[#6750a4] mb-2">歷史沿革</h3>
+                            <p class="text-[15px] text-[#49454f] leading-7 text-justify">
+                                ${spot.detail.history}
+                            </p>
+                        </section>
+
+                        <!-- Must Visit (Secondary Container) -->
+                        <section class="bg-[#e8def8]/40 p-5 rounded-[20px]">
+                            <h3 class="text-xs font-bold text-[#6750a4] uppercase tracking-wider mb-4 flex items-center">
+                                <i data-lucide="eye" width="16" class="mr-2"></i>
+                                必看重點
+                            </h3>
+                            <div class="flex flex-wrap gap-2">
+                                ${spot.mustVisit.map(item => `
+                                    <div class="bg-[#fef7ff] px-3 py-1.5 rounded-lg shadow-sm border border-[#cac4d0]/20 flex items-center gap-2">
+                                        <i data-lucide="camera" width="14" class="text-[#6750a4] shrink-0"></i>
+                                        <span class="text-sm text-[#1d1b20]">${item}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </section>
+
+                        <!-- Features & Highlight -->
+                        <section>
+                            <h3 class="text-sm font-medium text-[#6750a4] mb-2">特色與地位</h3>
+                            <p class="text-[15px] text-[#49454f] leading-7 mb-6">
+                                ${spot.detail.features}
+                            </p>
+
+                            <!-- Highlight Card (Tertiary Container equivalent) -->
+                            <div class="bg-[#ffd8e4]/40 p-6 rounded-[24px] text-[#31111d] relative overflow-hidden">
+                                <div class="absolute -right-4 -top-4 text-[#ffd8e4] opacity-100 mix-blend-multiply">
+                                    <i data-lucide="star" width="80" fill="#ffd8e4" stroke="none"></i>
+                                </div>
+                                <p class="text-[11px] font-bold text-[#cf1e66] uppercase tracking-widest mb-2 opacity-80">知識精華</p>
+                                <p class="text-base font-medium relative z-10 leading-snug">
+                                    ${spot.detail.highlight}
+                                </p>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Footer Meta -->
+                    <div class="mt-8 pt-4 border-t border-[#cac4d0]/30">
+                         <div class="inline-flex items-center text-[#410002] bg-[#ffdad6] px-4 py-2 rounded-xl text-sm font-medium">
+                            <i data-lucide="clock" width="16" class="mr-2"></i>
+                            ${spot.timeDisplay}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            lucide.createIcons();
+
+            const backdrop = document.getElementById('modal-backdrop');
+            const sheet = document.getElementById('modal-sheet');
+
+            backdrop.classList.add('backdrop-enter');
+            sheet.classList.add('modal-enter');
+
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const backdrop = document.getElementById('modal-backdrop');
+            const sheet = document.getElementById('modal-sheet');
+
+            backdrop.classList.remove('backdrop-enter');
+            sheet.classList.remove('modal-enter');
+
+            setTimeout(() => {
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        // Initialize
+        renderApp();
     </script>
 </body>
+
 </html>
